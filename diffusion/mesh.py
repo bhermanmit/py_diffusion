@@ -22,6 +22,8 @@ class Mesh(object):
         self._left_boundary = ''
         self._right_boundary = ''
 
+        self._fine_mesh = None
+
     @property
     def material_map(self):
 
@@ -85,6 +87,14 @@ class Mesh(object):
 
         self._part_mesh = part_mesh
 
+    @property
+    def num_parts(self):
+
+        """Number of parts in mesh.
+        """
+
+        return self._num_parts
+
     def set_left_boundary(self, left_boundary):
 
         """Set the left boundary condition.
@@ -103,6 +113,31 @@ class Mesh(object):
 
         self._right_boundary = right_boundary
 
+    def generate(self):
+
+        """Generates the fine mesh.
+        """
+
+        self._fine_mesh = self._part_sizes / self._part_mesh
+
+    def get_material(self, index):
+
+        """Retrieves the material for a mesh index.
+        """ 
+
+        coarse_index = self._fine_to_coarse(index)
+
+        return self._material_map[coarse_index]
+
+    def get_width(self, index):
+
+        """Retrieves the width for a mesh index.
+        """ 
+
+        coarse_index = self._fine_to_coarse(index)
+
+        return self._fine_mesh[coarse_index]
+
     @staticmethod
     def _validate_boundary(boundary):
 
@@ -113,3 +148,17 @@ class Mesh(object):
             boundary != "zero":
 
             raise ValueError("Boundary conditions not valid.")
+
+    def _fine_to_coarse(self, fine_index):
+
+        """Returns the coarse mesh index.
+        """
+
+        boundary = 0
+        for i in xrange(len(self._part_mesh)):
+            boundary += self._part_mesh[i]
+
+            if fine_index < boundary:
+                return i
+
+        raise Exception("Could not determine coarse index.")

@@ -17,10 +17,19 @@ class Material(object):
         self._num_energy_groups = num_energy_groups
 
         self._total = None
+        self._removal = None
         self._scattering = None
         self._nu_fission = None
         self._diffusion = None
         self._chi = None
+
+    @property
+    def num_energy_groups(self):
+
+        """The number of energy groups.
+        """
+
+        return self._num_energy_groups
 
     @property
     def total(self):
@@ -42,6 +51,14 @@ class Material(object):
             raise ValueError("Size of total cross section invalid!")
 
         self._total = np.array(total)
+
+    @property
+    def removal(self):
+
+        """The removal macroscopic cross section.
+        """
+
+        return self._removal
 
     @property
     def scattering(self):
@@ -130,3 +147,13 @@ class Material(object):
             raise ValueError("Size of fission spectrum invalid.")
 
         self._chi = chi
+
+    def generate(self):
+
+        """Generates the rest of the material object.
+        """
+
+        self._removal = np.zeros((self._num_energy_groups,))
+
+        for i in xrange(self._num_energy_groups):
+            self._removal[i] = self._total[i] - self._scattering[i, i]
