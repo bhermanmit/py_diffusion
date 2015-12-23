@@ -138,6 +138,24 @@ class Mesh(object):
 
         return self._fine_mesh[coarse_index]
 
+    def extract_x(self):
+
+        """Calcultes the x mesh positions.
+        """
+
+        slab_x = np.zeros(self._part_mesh.sum())
+
+        count = 0
+        start = 0.0
+        for i in xrange(self._num_parts):
+            width = self._fine_mesh[i]
+            for j in xrange(self._part_mesh[i]):
+                slab_x[count] = start + width/2.0 + float(j)*width
+                count += 1
+            start += self._part_sizes[i]
+
+        return slab_x
+
     @staticmethod
     def _validate_boundary(boundary):
 

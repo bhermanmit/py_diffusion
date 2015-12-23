@@ -35,6 +35,24 @@ class Solver(object):
         self._left_albedo = 0.0
         self._right_albedo = 0.0
 
+        self._num_eigs = 1
+
+    @property
+    def num_eigs(self):
+
+        """The number of eigenvalues to solve for.
+        """
+
+        return self._num_eigs
+
+    @num_eigs.setter
+    def num_eigs(self, num_eigs):
+
+        """Sets the number eigenvalues
+        """
+
+        self._num_eigs = num_eigs
+
     def build_loss_matrix(self):
 
         """Builds left hand side loss matrix.
@@ -170,8 +188,6 @@ class Solver(object):
         loss_matrix = coo_matrix((vals, (rows, cols)),
                                  shape=(dimension, dimension)).tocsc() 
 
-        print loss_matrix[0, 0]
-
         return loss_matrix
 
     def build_production_matrix(self):
@@ -223,7 +239,6 @@ class Solver(object):
 
         return prod_matrix
 
-
     def solve(self):
 
         """Solves the diffusion system.
@@ -232,9 +247,32 @@ class Solver(object):
         loss_matrix = self.build_loss_matrix()
         prod_matrix = self.build_production_matrix()
 
-        w, v = scipy.sparse.linalg.eigs(A=prod_matrix, M=loss_matrix)
+        eigs, vectors = scipy.sparse.linalg.eigs(A=prod_matrix, M=loss_matrix,
+                                                 which='LR', k=self._num_eigs)
 
-        return w, v
+        eigs = eigs.real
+        vectors = vectors.reshape((self._num_energy_groups, self._num_mesh,
+                                   self._num_eigs))
+        vectors = vectors.real
+
+        self._eigs = eigs
+        self._vectors = vectors
+
+    def extract_eigenvalues(self):
+
+        """Extracts the eigenvalues.
+        """
+
+        return self._eigs
+
+    def extract_eigenvectors(self):
+
+        """Extracts the eigenvectors.
+        """
+
+        slab_pos = self._mesh.extract_x()
+
+        return slab_pos, self._vectors
 
     def _matrix_to_indices(self, matrix):
 
