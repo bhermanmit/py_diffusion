@@ -95,21 +95,43 @@ class Mesh(object):
 
         return self._num_parts
 
-    def set_left_boundary(self, left_boundary):
+    @property
+    def left_boundary(self):
+
+        """The left boundary albedo.
+        """
+
+        return self._left_boundary
+
+    @left_boundary.setter
+    def left_boundary(self, left_boundary):
 
         """Set the left boundary condition.
         """
 
-        self._validate_boundary(left_boundary)
+        if isinstance(left_boundary, str):
+
+            left_boundary = self._validate_boundary(left_boundary)
 
         self._left_boundary = left_boundary
 
-    def set_right_boundary(self, right_boundary):
+    @property
+    def right_boundary(self):
+
+        """The right boundary albedo.
+        """
+
+        return self._right_boundary
+
+    @right_boundary.setter
+    def right_boundary(self, right_boundary):
 
         """Set the right boundary condition.
         """
 
-        self._validate_boundary(right_boundary)
+        if isinstance(right_boundary, str):
+
+            right_boundary = self._validate_boundary(right_boundary)
 
         self._right_boundary = right_boundary
 
@@ -162,10 +184,16 @@ class Mesh(object):
         """Validates the boundary condition option.
         """
 
-        if boundary != "reflective" and boundary != "vacuum" and \
-            boundary != "zero":
-
+        if boundary == "reflective":
+            boundary = 1.0
+        elif boundary == "vacuum":
+            boundary = 0.0
+        elif boundary == "zero":
+            boundary = -1.0
+        else:
             raise ValueError("Boundary conditions not valid.")
+
+        return boundary
 
     def _fine_to_coarse(self, fine_index):
 

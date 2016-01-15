@@ -32,8 +32,8 @@ class Solver(object):
         self._mesh.generate()
         self._materials.generate()
 
-        self._left_albedo = 0.0
-        self._right_albedo = 0.0
+        self._left_albedo = mesh.left_boundary 
+        self._right_albedo = mesh.right_boundary
 
         self._num_eigs = 1
 
@@ -271,6 +271,9 @@ class Solver(object):
         """
 
         slab_pos = self._mesh.extract_x()
+
+        if self._vectors[0, 0, 0] < 0.0:
+            self._vectors[:, :, 0] *= -1.0
 
         return slab_pos, self._vectors
 
