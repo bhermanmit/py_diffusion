@@ -86,14 +86,14 @@ class Solver(object):
             width_self = self._mesh.get_width(mesh_index)
             diffusion_self = material.diffusion[group_index]
             removal_self = material.removal[group_index]
-
+            
             # leakage left side neighbor
             if mesh_index != 0:
 
                 left_index = mesh_index - 1
                 width_left = self._mesh.get_width(left_index)
                 left_material_index = self._mesh.get_material(left_index)
-                left_material = self._materials[material_index]
+                left_material = self._materials[left_material_index]
 
                 diffusion_left = left_material.diffusion[group_index]
 
@@ -113,7 +113,7 @@ class Solver(object):
                 right_index = mesh_index + 1
                 width_right = self._mesh.get_width(right_index)
                 right_material_index = self._mesh.get_material(right_index)
-                right_material = self._materials[material_index]
+                right_material = self._materials[right_material_index]
 
                 diffusion_right = right_material.diffusion[group_index]
 
